@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import data from './data.js'
-const { routes, airlines, airports } = data;
+// import data from './data.js'
+const { 
+  routes, 
+  airlines, 
+  airports, 
+  getAirlineById, 
+  getAirportByCode 
+} = require('./data.js')
 
 const Table = ({tableData}) => {
   return (
@@ -24,9 +30,9 @@ const Table = ({tableData}) => {
         {tableData.map(({airline, src, dest}) => {
           return (
             <tr key={`${airline}${src}${dest}`}>
-              <td>{airline}</td>
-              <td>{src}</td>
-              <td>{dest}</td>
+              <td>{getAirlineById(airline)}</td>
+              <td>{getAirportByCode(src)}</td>
+              <td>{getAirportByCode(dest)}</td>
             </tr>
           )
         })}
