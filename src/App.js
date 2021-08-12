@@ -1,6 +1,40 @@
 import React, { Component } from 'react';
 import './App.css';
 
+import data from './data.js'
+const { routes, airlines, airports } = data;
+
+const Table = ({tableData}) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>
+            airline
+          </th>
+          <th>
+            source
+          </th>
+          <th>
+            dest
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {tableData.map(({airline, src, dest}) => {
+          return (
+            <tr key={`${airline}${src}${dest}`}>
+              <td>{airline}</td>
+              <td>{src}</td>
+              <td>{dest}</td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
+  )
+}
+
 const App = () => (
   <div className="app">
   <header className="header">
@@ -10,6 +44,7 @@ const App = () => (
     <p>
       Welcome to the app!
     </p>
+    <Table tableData={routes} />
   </section>
 </div>
 )
