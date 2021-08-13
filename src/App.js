@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import './App.css';
 
 // import data from './data.js'
@@ -10,32 +10,60 @@ const {
   getAirportByCode 
 } = require('./data.js')
 
-const Table = ({ columns, rows, format }) => {
+const Table = ({ columns, rows, format, perPage }) => {
+  const [ page, setPage ] = useState(0);
+
+  const totalRoutes = rows.length;
+  const lastPage = Math.round(totalRoutes / perPage) - 1
+  const rowsToShow = rows.slice(page * perPage, (page + 1) * perPage);
+  const routeRange = `${(page * perPage) + 1} - ${(page * perPage) + rowsToShow.length}`;
+
+  const nextPage = () => {
+    if (page < lastPage) {
+      setPage(page + 1);
+    }
+  }
+
+  const prevPage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  }
+
   return (
-    <table>
-      <thead>
-        <tr>
+    <div>    
+      <table>
+        <thead>
+          <tr>
+            {
+              columns.map(({ name, property }) => (
+                <th key={property}>{name}</th>)
+              )
+            }
+          </tr>
+        </thead>
+        <tbody>
           {
-            columns.map(({ name, property }) => (
-              <th key={property}>{name}</th>)
-            )
+            rowsToShow.map(row => {
+              return (
+                <tr key={Object.values(row).join()}>
+                  {
+                    Object.entries(row).map(([k, v], _) => {
+                      return (<td key={k+v}>{format(k, v)}</td>)
+                    })
+                  }
+                </tr>
+              )
+            })
           }
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(row => {
-          return (
-            <tr key={Object.values(row).join()}>
-              {
-                Object.entries(row).map(([k, v], _) => {
-                  return (<td key={k+v}>{format(k, v)}</td>)
-                })
-              }
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+      <div>
+        <p>Showing {routeRange} of {totalRoutes}.</p>
+        <button onClick={prevPage}>Prev Page</button>
+        <button onClick={nextPage}> Next Page</button>
+      </div>
+    </div>
   )
 }
 
@@ -74,6 +102,7 @@ const App = () => (
       columns={columns} 
       rows={routes}
       format={formatValue}
+      perPage={25}
     />
   </section>
 </div>
