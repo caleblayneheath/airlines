@@ -10,29 +10,27 @@ const {
   getAirportByCode 
 } = require('./data.js')
 
-const Table = ({tableData}) => {
+const Table = ({ columns, rows, format }) => {
   return (
     <table>
       <thead>
         <tr>
-          <th>
-            airline
-          </th>
-          <th>
-            source
-          </th>
-          <th>
-            dest
-          </th>
+          {
+            columns.map(({ name, property }) => (
+              <th key={property}>{name}</th>)
+            )
+          }
         </tr>
       </thead>
       <tbody>
-        {tableData.map(({airline, src, dest}) => {
+        {rows.map(row => {
           return (
-            <tr key={`${airline}${src}${dest}`}>
-              <td>{getAirlineById(airline)}</td>
-              <td>{getAirportByCode(src)}</td>
-              <td>{getAirportByCode(dest)}</td>
+            <tr key={Object.values(row).join()}>
+              {
+                Object.entries(row).map(([k, v], _) => {
+                  return (<td key={k+v}>{format(k, v)}</td>)
+                })
+              }
             </tr>
           )
         })}
@@ -40,6 +38,27 @@ const Table = ({tableData}) => {
     </table>
   )
 }
+
+
+const formatValue = (property, value) => { 
+  let func;
+  switch (property) {
+    case "airline":
+      func = getAirlineById
+      break;
+    case "src":
+    case "dest":
+      func = getAirportByCode
+      break;
+  }
+  return func(value)
+}
+
+const columns = [
+  {name: 'Airline', property: 'airline'},
+  {name: 'Source Airport', property: 'src'},
+  {name: 'Destination Airport', property: 'dest'},
+];
 
 const App = () => (
   <div className="app">
@@ -50,7 +69,12 @@ const App = () => (
     <p>
       Welcome to the app!
     </p>
-    <Table tableData={routes} />
+    <Table 
+      className="routes-table" 
+      columns={columns} 
+      rows={routes}
+      format={formatValue}
+    />
   </section>
 </div>
 )

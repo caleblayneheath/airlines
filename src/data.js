@@ -12,7 +12,6 @@ const getAirportByCode = code => {
   }
 }
 
-
 const routes = [
   {"airline":24,"src":"DFW","dest":"XNA"},
   {"airline":24,"src":"DFW","dest":"FWA"},
@@ -1415,5 +1414,5 @@ export {
   airlines, 
   airports, 
   getAirlineById, 
-  getAirportByCode
+  getAirportByCode,
 };
