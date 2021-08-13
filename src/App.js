@@ -1,7 +1,6 @@
 import React, { Component, useState } from 'react';
 import './App.css';
 
-// import data from './data.js'
 const { 
   routes, 
   airlines, 
@@ -67,7 +66,6 @@ const Table = ({ columns, rows, format, perPage }) => {
   )
 }
 
-
 const formatValue = (property, value) => { 
   let func;
   switch (property) {
@@ -88,24 +86,96 @@ const columns = [
   {name: 'Destination Airport', property: 'dest'},
 ];
 
-const App = () => (
-  <div className="app">
-  <header className="header">
-    <h1 className="title">Airline Routes</h1>
-  </header>
-  <section>
-    <p>
-      Welcome to the app!
-    </p>
-    <Table 
-      className="routes-table" 
-      columns={columns} 
-      rows={routes}
-      format={formatValue}
-      perPage={25}
+const filteredAirlines = airlines;
+
+const Select = (props) => {
+  const { options, valueKey, titleKey, allTitle, value, onSelect } = props;
+  return (
+    <select onChange={onSelect}>
+      <option value={value}>
+        {allTitle}
+      </option>
+      {
+        options.map(option => {
+          return (
+            <option 
+              key={option[valueKey]}
+              value={option[valueKey]}
+            >
+              {option[titleKey]}
+            </option>
+          );
+        })
+      }
+    </select>
+  );
+}
+
+const createSelector = (config => {
+  const { options, valueKey, titleKey, allTitle, value, onSelect } = config;
+  
+  return (
+    <Select 
+      options={options} 
+      valueKey={valueKey}
+      titleKey={titleKey}
+      allTitle={allTitle}
+      value={value} 
+      onSelect={onSelect} 
     />
-  </section>
-</div>
-)
+  );
+})
+
+const App = () => {
+  const [ filteredRoutes, setFilteredRoutes ] = useState(routes)
+
+  // const airlineSelector = (value = "") => {
+  //   return createSelector({
+  //     options: filteredAirlines,
+  //     valueKey: "id",
+  //     titleKey: "name",
+  //     allTitle: "All Airlines",
+  //     onSelect: setFilteredAirlines,
+  //     value,
+  //   });
+  // };
+
+  const filterRoutes = (event) => {
+    const id = Number(event.target.value);
+    const result = id ? routes.filter(({airline}) => airline === id) : routes
+    setFilteredRoutes(result);
+  };
+
+  const airlineSelector = (
+    <Select  
+      options={filteredAirlines}
+      valueKey="id"
+      titleKey="name"
+      allTitle="All Airlines"
+      onSelect={filterRoutes}
+      value=""
+    />
+  );
+  
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1 className="title">Airline Routes</h1>
+      </header>
+      <section>
+        <p>Show routes on {airlineSelector}</p>
+
+        <Table 
+          className="routes-table" 
+          columns={columns} 
+          rows={filteredRoutes}
+          format={formatValue}
+          perPage={25}
+        />
+      </section>
+    </div>
+  );
+};
 
 export default App;
