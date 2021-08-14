@@ -1,14 +1,14 @@
 const getAirlineById = id => {
-  const airline = airlines.find((entry) => entry.id === id)
+  const airline = airlines.find((entry) => entry.id === id);
   if (airline) {
-    return airline.name
+    return airline;
   }
 }
 
 const getAirportByCode = code => {
-  const airport = airports.find((entry) => entry.code === code)
+  const airport = airports.find((entry) => entry.code === code);
   if (airport) {
-    return airport.name
+    return airport;
   }
 }
 

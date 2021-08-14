@@ -77,7 +77,7 @@ const formatValue = (property, value) => {
       func = getAirportByCode
       break;
   }
-  return func(value)
+  return func(value).name;
 }
 
 const columns = [
@@ -86,13 +86,11 @@ const columns = [
   {name: 'Destination Airport', property: 'dest'},
 ];
 
-const filteredAirlines = airlines;
-
 const Select = (props) => {
   const { options, valueKey, titleKey, allTitle, value, onSelect } = props;
   return (
-    <select onChange={onSelect}>
-      <option value={value}>
+    <select value={value} onChange={(event) => onSelect(event.target.value)}>
+      <option value="all">
         {allTitle}
       </option>
       {
@@ -111,39 +109,36 @@ const Select = (props) => {
   );
 }
 
-const createSelector = (config => {
-  const { options, valueKey, titleKey, allTitle, value, onSelect } = config;
-  
-  return (
-    <Select 
-      options={options} 
-      valueKey={valueKey}
-      titleKey={titleKey}
-      allTitle={allTitle}
-      value={value} 
-      onSelect={onSelect} 
-    />
-  );
-})
+const filteredAirlines = airlines;
+const filteredAirports = airports;
 
 const App = () => {
-  const [ filteredRoutes, setFilteredRoutes ] = useState(routes)
+  const [ airline, setAirline ] = useState("all");
+  const [ airport, setAirport ] = useState("all");
 
-  // const airlineSelector = (value = "") => {
-  //   return createSelector({
-  //     options: filteredAirlines,
-  //     valueKey: "id",
-  //     titleKey: "name",
-  //     allTitle: "All Airlines",
-  //     onSelect: setFilteredAirlines,
-  //     value,
-  //   });
-  // };
+  const filteredRoutes = (() => {
+    return routes.filter(route => {
+      return (
+        (route.airline === airline || airline === "all") &&
+        (route.src === airport || route.dest === airport || airport === "all")
+      );
+    })
+  })();
 
-  const filterRoutes = (event) => {
-    const id = Number(event.target.value);
-    const result = id ? routes.filter(({airline}) => airline === id) : routes
-    setFilteredRoutes(result);
+  const airlineSelected = (value) => {
+    if (value !== "all") {
+      value = Number(value)
+    }
+    setAirline(value);
+  };
+
+  const airportSelected = (value) => {
+    setAirport(value);
+  };
+
+  const clearFilters = () => {
+    setAirline("all"); 
+    setAirport("all");
   };
 
   const airlineSelector = (
@@ -152,8 +147,19 @@ const App = () => {
       valueKey="id"
       titleKey="name"
       allTitle="All Airlines"
-      onSelect={filterRoutes}
-      value=""
+      onSelect={airlineSelected}
+      value={airline}
+    />
+  );
+
+  const airportSelector = (
+    <Select
+      options={filteredAirports}
+      valueKey="code"
+      titleKey="name"
+      allTitle="All Airports"
+      onSelect={airportSelected}
+      value={airport}
     />
   );
   
@@ -164,8 +170,8 @@ const App = () => {
         <h1 className="title">Airline Routes</h1>
       </header>
       <section>
-        <p>Show routes on {airlineSelector}</p>
-
+        <p>Show routes on {airlineSelector} flying in or out of {airportSelector}</p>
+        <button onClick={clearFilters}>Show All Routes</button>
         <Table 
           className="routes-table" 
           columns={columns} 
