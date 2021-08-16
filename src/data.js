@@ -1409,7 +1409,7 @@ const airports = [
 
 ];
 
-export {
+export default {
   routes, 
   airlines, 
   airports, 
